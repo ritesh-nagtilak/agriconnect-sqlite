@@ -10,8 +10,6 @@ Thumbs.db
 .env
 .env.*
 
-static/images/
-
 generated_image.png
 agriconnect_architecture.png
 
