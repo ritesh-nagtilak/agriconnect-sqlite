@@ -7,8 +7,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-agriconnect.db
-
 .env
 .env.*
 
