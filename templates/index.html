@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero-section bg-success text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content animate-fade-in">
+                    <h1 class="display-4 fw-bold mb-4">Fresh From Farm to Your Table</h1>
+                    <p class="lead mb-4">Connect directly with local farmers and get the freshest produce in your area. Support local agriculture while enjoying high-quality, farm-fresh products.</p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('product_list') }}" class="btn btn-light btn-lg me-3 animate-bounce">
+                            <i class="fas fa-shopping-cart me-2"></i>Shop Now
+                        </a>
+                        <a href="{{ url_for('register_form', user_type='farmer') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-tractor me-2"></i>Join as Farmer
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image text-center animate-slide-in">
+                    <i class="fas fa-seedling" style="font-size: 200px; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Why Choose AgriConnect?</h2>
+            <p class="text-muted">Experience the benefits of direct farm-to-consumer connection</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-leaf text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Fresh & Organic</h4>
+                    <p class="text-muted">Get the freshest produce directly from local farms with no middlemen involved.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-handshake text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Support Local Farmers</h4>
+                    <p class="text-muted">Help local farmers get fair prices and build sustainable farming communities.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4 h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-truck text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Fast Delivery</h4>
+                    <p class="text-muted">Quick delivery from nearby farms ensures you get fresh produce at your doorstep.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Featured Products</h2>
+            <p class="text-muted">Fresh picks from our local farmers</p>
+        </div>
+
+        {% if products %}
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6">
+                <div class="product-card h-100 animate-hover-lift">
+                    <div class="product-image-container">
+                        {% if product.image_filename %}
+                            <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" 
+                                 class="product-image" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="product-placeholder">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="product-overlay">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" 
+                               class="btn btn-success btn-sm">View Details</a>
+                        </div>
+                    </div>
+                    <div class="product-info p-3">
+                        <h5 class="product-title">{{ product.name }}</h5>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-user me-1"></i>{{ product.farmer_name }}<br>
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ product.farmer_location }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price fw-bold text-success">₹{{ "%.2f"|format(product.price) }}/{{ product.unit }}</span>
+                            <span class="badge bg-secondary">{{ product.category }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('product_list') }}" class="btn btn-success btn-lg">
+                View All Products <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-seedling text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+            <h4 class="mt-3 text-muted">No products available yet</h4>
+            <p class="text-muted">Be the first farmer to list your products!</p>
+            <a href="{{ url_for('register_form', user_type='farmer') }}" class="btn btn-success">
+                Join as Farmer
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3 class="stat-number text-success">500+</h3>
+                    <p class="stat-label text-muted">Happy Customers</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3 class="stat-number text-success">100+</h3>
+                    <p class="stat-label text-muted">Local Farmers</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3 class="stat-number text-success">50+</h3>
+                    <p class="stat-label text-muted">Product Categories</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3 class="stat-number text-success">24/7</h3>
+                    <p class="stat-label text-muted">Support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section bg-success text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Get Started?</h2>
+        <p class="lead mb-4">Join our community of farmers and buyers today!</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('register_form', user_type='buyer') }}" class="btn btn-light btn-lg me-3">
+                <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+            </a>
+            <a href="{{ url_for('register_form', user_type='farmer') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-tractor me-2"></i>Sell Your Produce
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

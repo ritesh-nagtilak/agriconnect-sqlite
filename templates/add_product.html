@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - AgriConnect{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add New Product</h3>
+                    <p class="mb-0 opacity-75">List your fresh produce on AgriConnect marketplace</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('add_product') }}" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="name" class="form-label">Product Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       placeholder="e.g., Fresh Organic Tomatoes" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="vegetables">Vegetables</option>
+                                    <option value="fruits">Fruits</option>
+                                    <option value="grains">Grains</option>
+                                    <option value="dairy">Dairy</option>
+                                    <option value="herbs">Herbs & Spices</option>
+                                    <option value="pulses">Pulses</option>
+                                    <option value="oils">Oils</option>
+                                    <option value="honey">Honey & Natural Products</option>
+                                    <option value="flowers">Flowers</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-4">
+                                <label for="price" class="form-label">Price per Unit *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="unit" class="form-label">Unit *</label>
+                                <select class="form-select" id="unit" name="unit" required>
+                                    <option value="">Select Unit</option>
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="ltr">Liter (ltr)</option>
+                                    <option value="ml">Milliliter (ml)</option>
+                                    <option value="piece">Piece</option>
+                                    <option value="dozen">Dozen</option>
+                                    <option value="bunch">Bunch</option>
+                                    <option value="packet">Packet</option>
+                                    <option value="bag">Bag</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="stock_quantity" class="form-label">Stock Quantity *</label>
+                                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" 
+                                       min="0" placeholder="100" required>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label for="description" class="form-label">Product Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      placeholder="Describe your product - quality, growing methods, freshness, etc."></textarea>
+                            <div class="form-text">Provide details about your product to help buyers make informed decisions</div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label for="image" class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept="image/*" onchange="previewImage(event)">
+                            <div class="form-text">Upload a high-quality image of your product (Max 16MB)</div>
+                            <div class="mt-3" id="image-preview-container" style="display: none;">
+                                <img id="image-preview" src="" alt="Preview" class="img-fluid rounded border" 
+                                     style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6><i class="fas fa-info-circle text-primary me-2"></i>Tips for Better Listing</h6>
+                            <ul class="mb-0 text-muted small">
+                                <li>Use clear, well-lit photos that showcase your product quality</li>
+                                <li>Write detailed descriptions highlighting freshness and growing methods</li>
+                                <li>Set competitive pricing based on local market rates</li>
+                                <li>Keep stock quantities updated to avoid overselling</li>
+                                <li>Respond promptly to customer inquiries</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('farmer_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>Add Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5><i class="fas fa-question-circle text-info me-2"></i>Need Help?</h5>
+                    <p class="text-muted mb-3">Here are some guidelines to create effective product listings:</p>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-camera text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Quality Photos</h6>
+                                <p class="text-muted small">Take clear, bright photos showing your product's best features</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-edit text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Detailed Description</h6>
+                                <p class="text-muted small">Include growing methods, freshness, and unique selling points</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-rupee-sign text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Fair Pricing</h6>
+                                <p class="text-muted small">Research local market prices to set competitive rates</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImage = document.getElementById('image-preview');
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const category = document.getElementById('category').value;
+    const price = parseFloat(document.getElementById('price').value);
+    const unit = document.getElementById('unit').value;
+    const stock = parseInt(document.getElementById('stock_quantity').value);
+
+    if (!name || !category || !unit) {
+        e.preventDefault();
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (price <= 0) {
+        e.preventDefault();
+        alert('Please enter a valid price greater than 0');
+        return;
+    }
+
+    if (stock < 0) {
+        e.preventDefault();
+        alert('Stock quantity cannot be negative');
+        return;
+    }
+});
+
+document.getElementById('category').addEventListener('change', function() {
+    const category = this.value;
+    const nameField = document.getElementById('name');
+    const unitField = document.getElementById('unit');
+
+    if (category === 'vegetables' || category === 'fruits') {
+        unitField.value = 'kg';
+    } else if (category === 'dairy') {
+        unitField.value = 'ltr';
+    } else if (category === 'herbs') {
+        unitField.value = 'bunch';
+    } else if (category === 'grains' || category === 'pulses') {
+        unitField.value = 'kg';
+    } else if (category === 'flowers') {
+        unitField.value = 'bunch';
+    }
+});
+</script>
+{% endblock %}

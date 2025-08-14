@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Buyer Dashboard - AgriConnect{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2 text-success"></i>Buyer Dashboard</h2>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ orders|length }}</h4>
+                            <p class="mb-0">Total Orders</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ orders|selectattr("status", "equalto", "pending")|list|length }}</h4>
+                            <p class="mb-0">Pending Orders</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ orders|selectattr("status", "equalto", "completed")|list|length }}</h4>
+                            <p class="mb-0">Completed Orders</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>₹{{ "%.2f"|format(orders|sum(attribute="total_amount")) }}</h4>
+                            <p class="mb-0">Total Spent</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-rupee-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>My Orders</h5>
+                    <a href="{{ url_for('product_list') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>Browse Products
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Farmer</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold">{{ order.product_name }}</span>
+                                        </td>
+                                        <td>{{ order.farmer_name }}</td>
+                                        <td>{{ order.quantity }}</td>
+                                        <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                        <td>
+                                            {% if order.status == 'pending' %}
+                                                <span class="badge bg-warning">{{ order.status.title() }}</span>
+                                            {% elif order.status == 'completed' %}
+                                                <span class="badge bg-success">{{ order.status.title() }}</span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="badge bg-danger">{{ order.status.title() }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ order.status.title() }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ order.created_at.split(' ')[0] if order.created_at else 'N/A' }}</td>
+                                        <td>
+                                            {% if order.status == 'completed' %}
+                                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#reviewModal{{ order.id }}">
+                                                    <i class="fas fa-star"></i> Review
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <h5 class="mt-3 text-muted">No orders yet</h5>
+                            <p class="text-muted">Start by browsing our fresh products from local farmers</p>
+                            <a href="{{ url_for('product_list') }}" class="btn btn-success btn-lg">
+                                <i class="fas fa-leaf me-2"></i>Browse Products
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for order in orders %}
+{% if order.status == 'completed' %}
+<div class="modal fade" id="reviewModal{{ order.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Review {{ order.product_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Rating *</label>
+                    <div class="rating">
+                        <input type="radio" id="star5-{{ order.id }}" name="rating-{{ order.id }}" value="5">
+                        <label for="star5-{{ order.id }}">★</label>
+                        <input type="radio" id="star4-{{ order.id }}" name="rating-{{ order.id }}" value="4">
+                        <label for="star4-{{ order.id }}">★</label>
+                        <input type="radio" id="star3-{{ order.id }}" name="rating-{{ order.id }}" value="3">
+                        <label for="star3-{{ order.id }}">★</label>
+                        <input type="radio" id="star2-{{ order.id }}" name="rating-{{ order.id }}" value="2">
+                        <label for="star2-{{ order.id }}">★</label>
+                        <input type="radio" id="star1-{{ order.id }}" name="rating-{{ order.id }}" value="1">
+                        <label for="star1-{{ order.id }}">★</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Comment</label>
+                    <textarea id="comment-{{ order.id }}" class="form-control" rows="3" 
+                              placeholder="Share your experience..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="submitReview({{ order.id }})">
+                    Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+function submitReview(orderId) {
+    const ratingInput = document.querySelector(`input[name="rating-${orderId}"]:checked`);
+    const commentInput = document.querySelector(`#comment-${orderId}`);
+    
+    if (!ratingInput) {
+        alert('Please select a rating');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('rating', ratingInput.value);
+    formData.append('comment', commentInput.value);
+    
+    fetch('/submit_review', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById(`reviewModal${orderId}`)).hide();
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error submitting review: ' + error.message);
+    });
+}
+</script>
+
+<style>
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+.rating input {
+    display: none;
+}
+.rating label {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: block;
+    background: #ddd;
+    color: #ffc107;
+    font-size: 24px;
+    text-align: center;
+    line-height: 30px;
+    margin-right: 5px;
+    border-radius: 5px;
+}
+.rating label:hover,
+.rating label:hover ~ label,
+.rating input:checked ~ label {
+    background: #ffc107;
+    color: white;
+}
+</style>
+{% endblock %}
